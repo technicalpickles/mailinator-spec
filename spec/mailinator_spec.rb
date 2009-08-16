@@ -28,5 +28,5 @@ describe Mailinator do
 
   it 'should have an alternate email address'
   it 'should have an RSS feed'
-  it 'should fetch a random primary address'
+  it 'should fetch a random primary email address'
 end
