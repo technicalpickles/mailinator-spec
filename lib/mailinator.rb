@@ -1,4 +1,8 @@
 require 'digest/sha1'
+require 'open-uri'
+require 'nokogiri'
+require 'cgi'
+require 'mail'
 
 class Mailinator
   BASE_URL = 'http://mailinator.com'
@@ -24,6 +28,22 @@ class Mailinator
 
   def widget_url(width = '250', height = '250')
     URI.parse("#{BASE_URL}/widget/mailin8r.jsp?w=#{width}&h=#{height}&b=#{@name}").to_s
+  end
+
+  def mailbox
+    doc = Nokogiri::HTML(open(atom_url))
+
+    doc.css('feed entry').map do |entry|
+      mail = Mail.new
+
+      mail.subject = entry.at_css('title').text
+      mail.body = entry.at_css('summary').text
+
+      mail.to = @email
+      mail.from = entry.at_css('author name').text
+
+      mail
+    end
   end
 
   def self.mostly_random
