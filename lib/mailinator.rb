@@ -2,7 +2,7 @@ require 'digest/sha1'
 require 'open-uri'
 require 'nokogiri'
 require 'cgi'
-require 'mail'
+require 'tmail'
 
 class Mailinator
   BASE_URL = 'http://mailinator.com'
@@ -34,7 +34,7 @@ class Mailinator
     doc = Nokogiri::HTML(open(atom_url))
 
     doc.css('feed entry').map do |entry|
-      mail = Mail.new
+      mail = TMail::Mail.new
 
       mail.subject = entry.at_css('title').text
       mail.body = entry.at_css('summary').text
@@ -53,6 +53,18 @@ class Mailinator
     new(sha.slice(0, 25))
   end
 
+  def self.domain=(domain)
+    @domain = domain
+  end
+
+  def self.reset_domain!
+    @domain = nil
+  end
+
+  def self.domain
+    @domain ||= "mailinator.com"
+  end
+
  private
 
   def action_url(action)
@@ -60,6 +72,6 @@ class Mailinator
   end
 
   def format_email(email)
-    email =~ /^[a-zA-Z0-9]+@mailinator.com$/ ? email : "#{email}@mailinator.com"
+    email =~ /^[a-zA-Z0-9]+@#{self.class.domain}$/ ? email : "#{email}@#{self.class.domain}"
   end
 end
