@@ -1,3 +1,5 @@
+require 'digest/sha1'
+
 class Mailinator
   BASE_URL = 'http://mailinator.com'
 
@@ -22,6 +24,13 @@ class Mailinator
 
   def widget_url(width = '250', height = '250')
     URI.parse("#{BASE_URL}/widget/mailin8r.jsp?w=#{width}&h=#{height}&b=#{@name}").to_s
+  end
+
+  def self.mostly_random
+    now = Time.now
+    sha = Digest::SHA1.hexdigest("#{now.to_i}#{now.usec}").to_s
+    
+    new(sha.slice(0, 25))
   end
 
  private
