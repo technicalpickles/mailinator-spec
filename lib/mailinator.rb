@@ -1,16 +1,3 @@
-dependencies = %w{
-  nokogiri
-  open-uri
-  uri
-}
-
-begin
-  dependencies.each { |lib| require lib }
-rescue LoadError
-  require 'rubygems'
-  dependencies.each { |lib| require lib }
-end
-
 class Mailinator
   BASE_URL = 'http://mailinator.com'
 
@@ -37,7 +24,7 @@ class Mailinator
     URI.parse("#{BASE_URL}/widget/mailin8r.jsp?w=#{width}&h=#{height}&b=#{@name}").to_s
   end
 
-  private
+ private
 
   def action_url(action)
     URI.parse("#{BASE_URL}/#{action}.jsp?email=#{@name}").to_s
