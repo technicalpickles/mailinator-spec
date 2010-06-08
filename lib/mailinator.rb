@@ -29,6 +29,10 @@ class Mailinator
     action_url('rss')
   end
 
+  def atom_url
+    action_url('atom')
+  end
+
   def widget_url(width = '250', height = '250')
     URI.parse("#{BASE_URL}/widget/mailin8r.jsp?w=#{width}&h=#{height}&b=#{@name}").to_s
   end

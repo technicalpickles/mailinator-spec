@@ -19,6 +19,10 @@ describe Mailinator do
     @mail.rss_url.should == "http://mailinator.com/rss.jsp?email=#{@random_name}"
   end
 
+  it 'should have an RSS URL' do
+    @mail.atom_url.should == "http://mailinator.com/atom.jsp?email=#{@random_name}"
+  end
+
   it 'should have a widget URL' do
     width  = '500'
     height = '250'
