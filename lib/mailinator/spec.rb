@@ -1,3 +1,4 @@
+require 'mailinator'
 require 'email-spec'
 
 class Mailinator

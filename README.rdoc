@@ -1,0 +1,102 @@
+= mailinator-spec
+
+Mailinator is a great little service that provides you with temporary email addresses, and provides a way to access. You can send email to any address at mailinator.com, and you're able to access that from the a browser or through rss and atom. 
+
+Now, imagine you are doing integration tests of funcaionality that send email. Ideally, you'd want to actually send the email, and verify that the message went through. Feasibly, you could send the  email to mailinator and then use their atom feed to check that the email went through. This is essentially what mailinator-spec comes in.
+
+
+  Scenario: Cucumber integration
+    Given I have mailinator email address
+    And I've manually sent an email to it
+    When I wait 2 seconds for mail to process
+    Then the email subject should match /omgwtfbbq/
+    And the email body should match /http:\/\/zombo\.com/
+
+
+== Setup
+
+Start off with the usual gem install:
+
+  gem install mailinator-spec
+
+mailinator-spec comes with two main modules:
+
+ * Mailinator::Spec::Matchers
+ * Mailinator::Spec::Helpers
+
+For RSpec, you can add these to spec/spec_helper.rb:
+
+  require 'mailinator'
+  Spec::Runner.configure do |config|
+    config.include Mailinator::Spec::Matchers
+    config.include Mailinator::Spec::Helpers
+  end
+
+It's also usable from cucumber:
+
+  require 'mailinator/spec'
+  require 'mailinator/steps'
+  World(Mailinator::Spec::Matchers)
+  World(Mailinator::Spec::Helpers)
+
+== Usage
+
+At the core of mailinator-spec is the Mailinator class. This represents a mailbox over at http://mailinator.com. It provides you an easy way to get URLs for accessing the mailbox, as well as providing TMail objects of the emails in the mailbox.
+
+  mailinator = Mailinator.new('zombo-consumer')
+  mailinator.email # => "zombo-consumer@mailinator.com"
+  mailinator.inbox_url # => "http://mailinator.com/maildir.jsp?email=zombo-consumer@mailinator.com"
+  mailinator.rss_url # => "http://mailinator.com/rss.jsp?email=zombo-consumer@mailinator.com"
+  mailinator.atom_url # => "http://mailinator.com/atom.jsp?email=zombo-consumer@mailinator.com"
+  mailinator.mailbox # => [#<TMail::Mail port=#<TMail::StringPort:id=0x8110d1d8> bodyport=#<TMail::StringPort:id=0x8110c0f8>>]
+  mailinator.mailbox.first.from # => "noreply@zombo.com"
+  mailinator.mailbox.first.subject # => "Welcome to zombo.com!"
+  mailinator.mailbox.first.to # => "The only limitation... is you!"
+  mailinator.mailbox.first.body # => "The only limitation... is you!"
+
+You might not actually care what the address is that you receive email to. For this case, there's a convenience method for creating a (mostly) random one:
+
+  mailinator = Mailinator.mostly_random
+  mailinator.email # => "7d6f4373dbfde6a698f1000eb@mailinator.com"
+  mailinator = Mailinator.new('zombo-consumer')
+  mailinator.email # => "zombo-consumer@mailinator.com"
+
+You can also change which domain is used for the email address. This is useful if your application specifically prevents users from using mailinator addresses.
+
+  Mailinator.domain = 'mailinator.zombo.com'
+  mailinator = Mailinator.new('zombo-consumer')
+  mailinator.email # => "zombo-consumer@mailinator.zombo.com"
+
+For this to properly work, you'd need to FIXME to provide that information
+
+
+For RSpec and Cucumber, this is exposed slightly more convenient way, and there are matchers (courtesy of email-spec)
+
+   describe "zombo.com welcome" do
+     before do
+       @to = mailinator.email # for a random address
+       # @to = mailinator('me') # for a specific address
+
+       # send some email
+
+       @email = last_mailinator_email # shorthand for mailinator.mailbox.last
+     end
+
+     it "is from noreply@zombo.com" do
+       @email.should be_delivered_from('noreply@zombo.com')
+     end
+
+     it "has welcoming subject" do
+       @email.should have_subject('Welcome to zombo.com')
+     end
+
+     it "tells us our about our limitation" do
+       @email.should have_body_text("The only limitation... is you!")
+     end
+   end
+
+In cucumber, you can use the same exact techniques. In addition, there are handful of step definitions provided:
+
+    When I wait 2 seconds for mail to process
+    Then the email subject should match /omgwtfbbq/
+    And the email body should match /http:\/\/zombo\.com/
