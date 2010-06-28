@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "mailinator-spec"
     gem.summary = %Q{mailinate the contryside... from rspec and cucumber}
-    gem.description = %Q{cucumber-mailinator is a small library for using mailinator for testing email from cucumber} 
+    gem.description = %Q{mailinator-spec is a library for using mailinator for testing email from rspec and cucumber} 
     gem.email = "josh@technicalpickles.com"
     gem.homepage = "http://github.com/technicalpickles/mailinator-spec"
     gem.authors = ["Joshua Nichols"]
